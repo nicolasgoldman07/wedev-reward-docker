@@ -1,0 +1,35 @@
+version: '3.7'
+services:
+  postgres:
+    image: postgres:12
+    container_name: 'wedev-db'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./pg/db_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  ####################################################
+  backend:
+    image: nicolasgoldman07/werewards-backend
+    container_name: 'wedev-backend'
+    ports:
+      - '3001:3001'
+    links:
+      - postgres
+    environment:
+      SECRET: piano concerto no1 frederic chopin
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/rewardsapp_dev
+    depends_on:
+      - postgres
+    volumes:
+      - /usr/src/app/node_modules
+  ####################################################
+  frontend:
+    container_name: 'wedev-frontend'
+    image: nicolasgoldman07/werewards-frontend
+    ports:
+      - '3000:3000'
+    stdin_open: true
